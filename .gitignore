@@ -161,3 +161,5 @@ cython_debug/
 
 # MyCustom
 .idea/
+videos/
+*.zip
