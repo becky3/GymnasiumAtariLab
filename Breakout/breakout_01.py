@@ -1,48 +1,56 @@
+import os
 import torch
+
+from datetime import datetime
+from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.env_util import make_atari_env
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.vec_env import VecVideoRecorder
-from stable_baselines3 import A2C
-
+from stable_baselines3 import PPO
 
 print(torch.version.cuda)
 print(torch.cuda.is_available())
 
 model_name = "./Breakout/a2c_breakout_01"
-env_id = "ALE/Breakout-v5"
+# env_id = "BreakoutNoFrameskip-v0"
+env_id = "BreakoutNoFrameskip-v4"
+# env_id = "ALE/Breakout-v5"
 
 
 def train():
-    # There already exists an environment generator
-    # that will make and wrap atari environments correctly.
-    # Here we are also multi-worker training (n_envs=4 => 4 environments)
-    vec_env = make_atari_env(env_id, n_envs=8, seed=0)
-    # Frame-stacking with 4 frames
-    vec_env = VecFrameStack(vec_env, n_stack=4)
 
-    model = A2C("CnnPolicy", vec_env, verbose=1, device="cuda")
-    model.learn(total_timesteps=50_000)
+    env = make_atari_env(env_id, n_envs=8, seed=0)
+    env = VecFrameStack(env, n_stack=4)
 
-    # Save the model
+    # env.metadata["render_fps"] = 60
+
+    model = PPO("CnnPolicy", env, verbose=1, device="cuda")
+    model.learn(total_timesteps=1_000_000)
+
+    mean_reward, std_reward = evaluate_policy(
+        model, env, n_eval_episodes=10, deterministic=True
+    )
+    print(f"mean_reward={mean_reward:.2f} +/- {std_reward}")
+
     model.save(model_name)
 
 
 def play_and_record():
 
-    # Create a single environment for gameplay
     env = make_atari_env(env_id, n_envs=1)
     env = VecFrameStack(env, n_stack=4)
 
-    # Load the trained model
-    model = A2C.load(model_name, env=env)
+    model = PPO.load(model_name, env=env)
 
-    # Set the render_fps in the environment metadata
-    env.metadata["render_fps"] = 60
+    # env.metadata["render_fps"] = 60
 
-    # Wrap the environment to record gameplay
+    now = datetime.now()
+    dt_string = now.strftime("%Y%m%d_%H%M%S")
+    video_folder = os.path.join("./videos", dt_string)
+
     env = VecVideoRecorder(
         env,
-        video_folder="./videos",
+        video_folder=video_folder,
         record_video_trigger=lambda x: x % 1000 == 0,
     )
 
@@ -56,5 +64,5 @@ def play_and_record():
     env.close()
 
 
-# train()
+train()
 play_and_record()
