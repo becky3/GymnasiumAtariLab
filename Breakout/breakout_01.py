@@ -25,7 +25,7 @@ def train():
     # env.metadata["render_fps"] = 60
 
     model = PPO("CnnPolicy", env, verbose=1, device="cuda")
-    model.learn(total_timesteps=1_000_000)
+    model.learn(total_timesteps=10_000_000)
 
     mean_reward, std_reward = evaluate_policy(
         model, env, n_eval_episodes=10, deterministic=True
