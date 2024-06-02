@@ -165,7 +165,7 @@ def optimize_model():
     optimizer.step()
 
 
-num_episodes = 5000000  # 学習させるエピソード数
+num_episodes = 50  # 学習させるエピソード数
 
 
 n_frame = 6  # 過去フレームの利用数
@@ -182,8 +182,8 @@ EPS_DECAY = 25000000
 TAU = 0.005
 LR = 1e-4
 
-num_episode_plot = 2500  # 何エピソードで学習の進捗を確認するか
-num_episode_save = 25000  # 何エピソードでモデルを保存するか
+num_episode_plot = 5  # 2500  # 何エピソードで学習の進捗を確認するか
+num_episode_save = 5  # 25000  # 何エピソードでモデルを保存するか
 
 # モデルの初期化
 env = gym.make("ALE/Breakout-v5", render_mode="rgb_array")
