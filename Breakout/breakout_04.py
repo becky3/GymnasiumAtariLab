@@ -25,6 +25,13 @@ DEVICE = "cuda"
 BATCH_SIZE = 2048
 TOTAL_TIMESTEPS = 10_000_000
 # 10_000_000 (6/6)
+# 10_000_000 (6/16)
+# 1_000_000 (6/17)
+# 9_000_000 (6/18)
+# 9_000_000 (6/19)
+# 11_000_000 (6/20)
+# 10_000_000 (6/21)
+
 PROGRESS_BAR = True
 EVAL_INTERVAL = 100000
 SAVE_INTERVAL = 500000
@@ -95,7 +102,7 @@ def train():
             model, env, n_eval_episodes=10, deterministic=True
         )
 
-        if i % SAVE_INTERVAL == 0:
+        if i != 0 and i % SAVE_INTERVAL == 0:
             logging.info("saving...")
             model.save(MODEL_NAME)
             logging.info(f"******** Model saved at step {i}")
@@ -151,5 +158,5 @@ def play_and_record():
     env.close()
 
 
-# train()
+train()
 play_and_record()
